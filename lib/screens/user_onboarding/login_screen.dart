@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-// import 'package:saur_stockist/screens/home_container/home_container.dart';
 import 'package:saur_stockist/screens/password_recovery/recover_password_screen.dart';
 import 'package:saur_stockist/screens/user_onboarding/register_screen.dart';
 import 'package:saur_stockist/utils/colors.dart';
@@ -9,6 +8,8 @@ import 'package:saur_stockist/widgets/gaps.dart';
 import 'package:saur_stockist/widgets/input_field_dark.dart';
 import 'package:saur_stockist/widgets/input_password_field_dark.dart';
 import 'package:saur_stockist/widgets/primary_button.dart';
+
+import '../home_container/home_container.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -90,11 +91,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 verticalGap(defaultPadding * 2),
                 PrimaryButton(
                   onPressed: () {
-                    // Navigator.pushNamedAndRemoveUntil(
-                    //   context,
-                    //   HomeContainer.routePath,
-                    //   (route) => false,
-                    // );
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      HomeContainer.routePath,
+                      (route) => false,
+                    );
                   },
                   label: 'Login',
                   isDisabled: false,

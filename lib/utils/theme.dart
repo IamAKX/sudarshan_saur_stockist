@@ -14,10 +14,7 @@ ThemeData globalTheme(BuildContext context) {
     brightness: Brightness.light,
     useMaterial3: false,
     scaffoldBackgroundColor: background,
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      background: background, // Your accent color
-    ),
-    primarySwatch: Colors.indigo,
+    primarySwatch: primarySwatch,
     dividerColor: dividerColor,
     secondaryHeaderColor: Colors.grey[700],
     primaryColor: primaryColor,

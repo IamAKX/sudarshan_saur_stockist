@@ -17,10 +17,11 @@ class EditName extends StatefulWidget {
 
 class _EditNameState extends State<EditName> {
   final TextEditingController _nameCtrl = TextEditingController();
+  final TextEditingController _businessNameCtrl = TextEditingController();
+  final TextEditingController _businessAddressCtrl = TextEditingController();
   @override
   void initState() {
     super.initState();
-    _nameCtrl.text = 'John Doe';
   }
 
   @override
@@ -34,11 +35,33 @@ class _EditNameState extends State<EditName> {
         ),
         verticalGap(defaultPadding),
         InputFieldLight(
-            hint: 'Phone Number',
+            hint: 'Full Name',
             controller: _nameCtrl,
             keyboardType: TextInputType.name,
             obscure: false,
             icon: LineAwesomeIcons.user),
+        verticalGap(defaultPadding),
+        const Text(
+          'Enter Business name',
+        ),
+        verticalGap(defaultPadding),
+        InputFieldLight(
+            hint: 'Business Name',
+            controller: _businessNameCtrl,
+            keyboardType: TextInputType.name,
+            obscure: false,
+            icon: LineAwesomeIcons.briefcase),
+        verticalGap(defaultPadding),
+        const Text(
+          'Enter Business Address',
+        ),
+        verticalGap(defaultPadding),
+        InputFieldLight(
+            hint: 'Business Address',
+            controller: _businessAddressCtrl,
+            keyboardType: TextInputType.streetAddress,
+            obscure: false,
+            icon: LineAwesomeIcons.address_card),
         verticalGap(defaultPadding * 2),
         PrimaryButtonDark(
           onPressed: () {

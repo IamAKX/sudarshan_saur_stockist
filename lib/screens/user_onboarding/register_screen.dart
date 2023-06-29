@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/screens/user_onboarding/business_detail.dart';
 import 'package:saur_stockist/screens/user_onboarding/otp_verification.dart';
 import 'package:saur_stockist/screens/user_onboarding/user_detail.dart';
 import 'package:saur_stockist/utils/theme.dart';
@@ -21,6 +22,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _phoneCtrl = TextEditingController();
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _otpCodeCtrl = TextEditingController();
+  final TextEditingController _businessNameCtrl = TextEditingController();
+  final TextEditingController _businessAddressCtrl = TextEditingController();
+  final TextEditingController _gstNumberCtrl = TextEditingController();
   int step = 1;
 
   @override
@@ -88,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                         ),
                         Text(
-                          '/2',
+                          '/3',
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall
@@ -110,28 +114,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
             verticalGap(defaultPadding * 1.5),
-            Expanded(
-              child: step == 1
-                  ? UserDetail(
-                      emailCtrl: _emailCtrl,
-                      passwordCtrl: _passwordCtrl,
-                      phoneCtrl: _phoneCtrl,
-                      nameCtrl: _nameCtrl)
-                  : OtpVerification(
-                      phoneCtrl: _phoneCtrl,
-                      otpCode: '1234',
-                      otpCodeCtrl: _otpCodeCtrl,
-                    ),
-            ),
+            Expanded(child: getWidgetByStep(step)),
             verticalGap(defaultPadding * 1.5),
             Row(
               children: [
                 Visibility(
-                  visible: step == 2,
+                  visible: step > 1,
                   child: InkWell(
                     onTap: () {
                       setState(() {
-                        step = 1;
+                        step--;
                       });
                     },
                     child: const CircleAvatar(
@@ -145,11 +137,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const Spacer(),
                 Visibility(
-                  visible: step == 1,
+                  visible: step < 3,
                   child: InkWell(
                     onTap: () {
                       setState(() {
-                        step = 2;
+                        step++;
                       });
                     },
                     child: const CircleAvatar(
@@ -162,7 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: step == 2,
+                  visible: step == 3,
                   child: SizedBox(
                     width: 250,
                     child: PrimaryButton(
@@ -181,5 +173,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  getWidgetByStep(int step) {
+    switch (step) {
+      case 1:
+        return UserDetail(
+            emailCtrl: _emailCtrl,
+            passwordCtrl: _passwordCtrl,
+            phoneCtrl: _phoneCtrl,
+            nameCtrl: _nameCtrl);
+      case 2:
+        return BusinessDetails(
+            businessNameCtrl: _businessNameCtrl,
+            businessAddressCtrl: _businessAddressCtrl,
+            gstNumberCtrl: _gstNumberCtrl,);
+      case 3:
+        return OtpVerification(
+          phoneCtrl: _phoneCtrl,
+          otpCode: '1234',
+          otpCodeCtrl: _otpCodeCtrl,
+        );
+      default:
+    }
   }
 }

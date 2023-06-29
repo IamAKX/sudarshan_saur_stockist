@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:saur_stockist/screens/profile/edit_name.dart';
-import 'package:saur_stockist/screens/profile/edit_phone_number.dart';
-import 'package:saur_stockist/utils/colors.dart';
+import 'package:saur_stockist/screens/devices/assigned_devices.dart';
+import 'package:saur_stockist/screens/devices/unassigned_devices.dart';
 
-class EditProfile extends StatefulWidget {
-  const EditProfile({super.key});
-  static const String routePath = '/editProfile';
+import '../../utils/colors.dart';
+
+class DevicesScreen extends StatefulWidget {
+  const DevicesScreen({super.key});
 
   @override
-  State<EditProfile> createState() => _EditProfileState();
+  State<DevicesScreen> createState() => _DevicesScreenState();
 }
 
-class _EditProfileState extends State<EditProfile>
+class _DevicesScreenState extends State<DevicesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -32,7 +32,7 @@ class _EditProfileState extends State<EditProfile>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Profile',
+          'Devices',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         bottom: TabBar(
@@ -41,16 +41,16 @@ class _EditProfileState extends State<EditProfile>
           unselectedLabelColor: hintColor,
           indicatorColor: primaryColor,
           tabs: const [
-            Tab(text: 'Phone'),
-            Tab(text: 'Name & Address'),
+            Tab(text: 'Assigned'),
+            Tab(text: 'Unassigned'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: const [
-          EditPhoneNumber(),
-          EditName(),
+          AssignedDevices(),
+          UnassignedDevice(),
         ],
       ),
     );

@@ -7,6 +7,7 @@ environment:
   sdk: ">=3.0.3 <4.0.0"
 
 dependencies:
+  app_bar_with_search_switch: ^1.5.1
   awesome_dialog: ^3.1.0
   cached_network_image: any
   cupertino_icons: ^1.0.2

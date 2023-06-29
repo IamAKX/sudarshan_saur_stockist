@@ -18,6 +18,21 @@ const acceptedColor = Colors.green;
 const rejectedColor = Colors.red;
 const pendingColor = Colors.amber;
 
+Map<int, Color> color = const {
+  50: Color.fromRGBO(1, 52, 135, .1),
+  100: Color.fromRGBO(1, 52, 135, .2),
+  200: Color.fromRGBO(1, 52, 135, .3),
+  300: Color.fromRGBO(1, 52, 135, .4),
+  400: Color.fromRGBO(1, 52, 135, .5),
+  500: Color.fromRGBO(1, 52, 135, .6),
+  600: Color.fromRGBO(1, 52, 135, .7),
+  700: Color.fromRGBO(1, 52, 135, .8),
+  800: Color.fromRGBO(1, 52, 135, .9),
+  900: Color.fromRGBO(1, 52, 135, 1),
+};
+
+MaterialColor primarySwatch = MaterialColor(0xFF013487, color);
+
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
