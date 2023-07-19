@@ -3,6 +3,8 @@ import 'package:saur_stockist/screens/profile/edit_name.dart';
 import 'package:saur_stockist/screens/profile/edit_phone_number.dart';
 import 'package:saur_stockist/utils/colors.dart';
 
+import 'edit_address.dart';
+
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
   static const String routePath = '/editProfile';
@@ -42,7 +44,8 @@ class _EditProfileState extends State<EditProfile>
           indicatorColor: primaryColor,
           tabs: const [
             Tab(text: 'Phone'),
-            Tab(text: 'Name & Address'),
+            Tab(text: 'Personal Detail'),
+            Tab(text: 'Address'),
           ],
         ),
       ),
@@ -51,6 +54,7 @@ class _EditProfileState extends State<EditProfile>
         children: const [
           EditPhoneNumber(),
           EditName(),
+          EditAddress(),
         ],
       ),
     );
