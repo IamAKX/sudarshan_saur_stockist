@@ -1,12 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:saur_stockist/main.dart';
+import 'package:saur_stockist/model/user_model.dart';
 import 'package:saur_stockist/screens/profile/change_password.dart';
 import 'package:saur_stockist/screens/profile/edit_profile.dart';
 import 'package:saur_stockist/screens/user_onboarding/login_screen.dart';
 import 'package:saur_stockist/utils/colors.dart';
+import 'package:saur_stockist/utils/preference_key.dart';
 import 'package:saur_stockist/utils/theme.dart';
 import 'package:saur_stockist/widgets/gaps.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../service/api_service.dart';
+import '../../service/snakbar_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,8 +24,32 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late ApiProvider _api;
+  UserModel? user;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => reloadScreen(),
+    );
+  }
+
+  reloadScreen() async {
+    await _api
+        .getStockistById(prefs.getInt(SharedpreferenceKey.userId) ?? -1)
+        .then((value) {
+      setState(() {
+        user = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    SnackBarService.instance.buildContext = context;
+    _api = Provider.of<ApiProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -48,13 +80,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 profileImageWidget(),
                 verticalGap(defaultPadding),
                 Text(
-                  'John Doe',
+                  '${user?.stockistName}',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
                 Text(
-                  'john.doe@gmail.com',
+                  '${user?.email}',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(),
                 ),
               ],
@@ -167,11 +199,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(settingsPageUserIconSize),
-          child: Image.asset(
-            'assets/images/dummy_user.jpg',
-            height: 110,
-            width: 110,
-            fit: BoxFit.cover,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(110),
+            child: (user?.image?.isEmpty ?? true)
+                ? Image.asset(
+                    'assets/images/profile_image_placeholder.png',
+                    height: 110,
+                    width: 110,
+                    fit: BoxFit.cover,
+                  )
+                : CachedNetworkImage(
+                    imageUrl: user?.image ?? '',
+                    fit: BoxFit.cover,
+                    width: 110,
+                    height: 110,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/profile_image_placeholder.png',
+                      width: 110,
+                      height: 110,
+                    ),
+                  ),
           ),
         ),
         Positioned(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/screens/blocked_user/blocked_users_screen.dart';
 import 'package:saur_stockist/screens/dealers/dealer_detail.dart';
 import 'package:saur_stockist/screens/devices/assigned_detail.dart';
 import 'package:saur_stockist/screens/devices/new_assignment.dart';
@@ -38,6 +39,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const AssignedDetail());
       case NewAssignment.routePath:
         return MaterialPageRoute(builder: (_) => const NewAssignment());
+      case BlockedUserScreen.routePath:
+        return MaterialPageRoute(builder: (_) => const BlockedUserScreen());
       default:
         return errorRoute();
     }
