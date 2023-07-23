@@ -119,8 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                   },
                   label: 'Login',
-                  isDisabled: false,
-                  isLoading: false,
+                  isDisabled: _api.status == ApiStatus.loading,
+                  isLoading: _api.status == ApiStatus.loading,
                 ),
                 verticalGap(defaultPadding),
                 Row(

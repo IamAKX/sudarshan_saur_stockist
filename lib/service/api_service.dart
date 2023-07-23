@@ -99,11 +99,12 @@ class ApiProvider extends ChangeNotifier {
         if (user.status == UserStatus.ACTIVE.name) {
           status = ApiStatus.success;
           notifyListeners();
+          return true;
         } else {
           status = ApiStatus.failed;
           notifyListeners();
+          return false;
         }
-        return true;
       }
     } on DioException catch (e) {
       status = ApiStatus.failed;

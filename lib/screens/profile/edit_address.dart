@@ -116,7 +116,6 @@ class _EditAddressState extends State<EditAddress> {
             }
 
             Map<String, dynamic> map = {
-              "stockistId": user?.stockistId,
               "address": {
                 "addressLine1": addressLine1Ctrl.text,
                 "addressLine2": addressLine2Ctrl.text,
@@ -126,7 +125,9 @@ class _EditAddressState extends State<EditAddress> {
                 "zipCode": zipCodeCtrl.text
               }
             };
-            _api.updateUser(map, user?.stockistId ?? -1).then((value) async {
+            await _api
+                .updateUser(map, user?.stockistId ?? -1)
+                .then((value) async {
               if (value) {
                 await reloadScreen();
                 showPopup(context, DialogType.success, 'Success',

@@ -159,7 +159,7 @@ class _EditPhoneNumberState extends State<EditPhoneNumber> {
                 if (value) {
                   await reloadScreen();
                   showPopup(context, DialogType.success, 'Success',
-                      'Your address is updated');
+                      'Your phone number is updated');
                 }
               });
             },
