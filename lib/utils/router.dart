@@ -11,6 +11,7 @@ import 'package:saur_stockist/screens/user_onboarding/agreement_screen.dart';
 import 'package:saur_stockist/screens/user_onboarding/login_screen.dart';
 import 'package:saur_stockist/screens/user_onboarding/register_screen.dart';
 
+import '../model/warranty_model.dart';
 import '../screens/app_intro/app_intro_screen.dart';
 import '../screens/home_container/home_container.dart';
 
@@ -34,11 +35,20 @@ class NavRoute {
       case ChangePassword.routePath:
         return MaterialPageRoute(builder: (_) => const ChangePassword());
       case DealerDetail.routePath:
-        return MaterialPageRoute(builder: (_) => const DealerDetail());
+        return MaterialPageRoute(
+            builder: (_) => DealerDetail(
+                  data: settings.arguments as Map<String, dynamic>,
+                ));
       case AssignedDetail.routePath:
-        return MaterialPageRoute(builder: (_) => const AssignedDetail());
+        return MaterialPageRoute(
+            builder: (_) => AssignedDetail(
+                  warrantyModel: settings.arguments as WarrantyModel,
+                ));
       case NewAssignment.routePath:
-        return MaterialPageRoute(builder: (_) => const NewAssignment());
+        return MaterialPageRoute(
+            builder: (_) => NewAssignment(
+                  warranty: settings.arguments as Map<String, WarrantyModel>,
+                ));
       case BlockedUserScreen.routePath:
         return MaterialPageRoute(builder: (_) => const BlockedUserScreen());
       default:

@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:saur_stockist/model/model_list/warranty_request_list.dart';
+import 'package:saur_stockist/model/user_model.dart';
+import 'package:saur_stockist/model/warranty_model.dart';
 import 'package:saur_stockist/screens/devices/new_assignment.dart';
 import 'package:saur_stockist/utils/colors.dart';
+import 'package:saur_stockist/utils/helper_method.dart';
+import 'package:saur_stockist/utils/theme.dart';
+
+import '../../main.dart';
+import '../../service/api_service.dart';
+import '../../service/snakbar_service.dart';
+import '../../utils/preference_key.dart';
 
 class UnassignedDevice extends StatefulWidget {
   const UnassignedDevice({super.key});
@@ -11,35 +22,86 @@ class UnassignedDevice extends StatefulWidget {
 }
 
 class _UnassignedDeviceState extends State<UnassignedDevice> {
-  Set<int> selectedIndex = {};
+  Map<String, WarrantyModel> selectedIndex = {};
+  UserModel? user;
+  WarrantyRequestList? list;
+  late ApiProvider _api;
 
-  addToList(int index) {
-    setState(() {
-      selectedIndex.add(index);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => reloadUser(),
+    );
+  }
+
+  reloadUser() async {
+    await _api
+        .getStockistById(prefs.getInt(SharedpreferenceKey.userId) ?? -1)
+        .then((value) {
+      setState(() async {
+        user = value;
+        if (user != null) {
+          SnackBarService.instance.showSnackBarInfo(
+              'This is taking longer than usual, please wait...');
+          list = await _api.getWarrantyRequestListFromCrm(user?.mobileNo ?? '');
+        }
+      });
     });
   }
 
-  removeFromList(int index) {
+  addToList(WarrantyModel? warranty) {
     setState(() {
-      selectedIndex.remove(index);
+      selectedIndex[warranty!.warrantySerialNo ?? ''] = warranty!;
+    });
+  }
+
+  removeFromList(WarrantyModel? warranty) {
+    setState(() {
+      selectedIndex.remove(warranty!.warrantySerialNo);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    SnackBarService.instance.buildContext = context;
+    _api = Provider.of<ApiProvider>(context);
+
     return Scaffold(
-      body: getBody(context),
+      body: _api.status == ApiStatus.loading
+          ? const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  Padding(
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: Text(
+                      'Executing long running process.\nPlease do not leave the screen',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+            )
+          : getBody(context),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterFloat,
       floatingActionButton: selectedIndex.isEmpty
           ? null
-          : FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, NewAssignment.routePath);
-              },
-              backgroundColor: primaryColor,
-              child: const Icon(LineAwesomeIcons.user_plus),
-            ),
+          : list?.data?.isEmpty ?? true
+              ? Container()
+              : FloatingActionButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      NewAssignment.routePath,
+                      arguments: selectedIndex,
+                    ).then((value) => reloadUser());
+                  },
+                  backgroundColor: primaryColor,
+                  child: const Icon(LineAwesomeIcons.user_plus),
+                ),
     );
   }
 
@@ -60,13 +122,13 @@ class _UnassignedDeviceState extends State<UnassignedDevice> {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Checkbox(
-                value: selectedIndex.length == 20,
+                value: selectedIndex.length == list?.data?.length,
                 onChanged: (value) {
                   setState(() {
                     if (value ?? false) {
-                      for (var i = 0; i < 20; i++) {
-                        selectedIndex.add(i);
-                      }
+                      list?.data?.forEach((element) {
+                        addToList(element);
+                      });
                     } else {
                       selectedIndex.clear();
                     }
@@ -81,24 +143,26 @@ class _UnassignedDeviceState extends State<UnassignedDevice> {
               itemBuilder: (context, index) => CheckboxListTile(
                     tileColor: Colors.white,
                     title: Text(
-                      '200 WUGL-A-58X200-10',
+                      getWarantyLabel(list?.data?.elementAt(index)),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    subtitle: Text('Serial Number : 221548$index'),
+                    subtitle: Text(
+                        'Serial Number : ${list?.data?.elementAt(index).warrantySerialNo ?? ''}'),
                     onChanged: (bool? value) {
                       if (value ?? false) {
-                        addToList(index);
+                        addToList(list?.data?.elementAt(index));
                       } else {
-                        removeFromList(index);
+                        removeFromList(list?.data?.elementAt(index));
                       }
                     },
-                    value: selectedIndex.contains(index),
+                    value: selectedIndex.containsKey(
+                        list?.data?.elementAt(index).warrantySerialNo ?? ''),
                   ),
               separatorBuilder: (context, index) => const Divider(
                     height: 1,
                     color: dividerColor,
                   ),
-              itemCount: 20),
+              itemCount: list?.data?.length ?? 0),
         ),
       ],
     );

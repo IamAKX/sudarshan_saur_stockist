@@ -1,25 +1,56 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:saur_stockist/model/dealer_model.dart';
+import 'package:saur_stockist/model/warranty_model.dart';
+import 'package:saur_stockist/service/api_service.dart';
+import 'package:saur_stockist/utils/helper_method.dart';
 import 'package:saur_stockist/utils/theme.dart';
+import 'package:saur_stockist/widgets/alert_popup.dart';
 
+import '../../model/model_list/warranty_request_list.dart';
+import '../../service/snakbar_service.dart';
 import '../../utils/colors.dart';
 import '../../widgets/gaps.dart';
 
 class DealerDetail extends StatefulWidget {
-  const DealerDetail({super.key});
+  const DealerDetail({super.key, required this.data});
   static const String routePath = '/dealerDetail';
+  final Map<String, dynamic> data;
 
   @override
   State<DealerDetail> createState() => _DealerDetailState();
 }
 
 class _DealerDetailState extends State<DealerDetail> {
+  DealerModel? dealer;
+  List<WarrantyModel> filteredList = [];
+  WarrantyRequestList? list;
+  late ApiProvider _api;
+
+  @override
+  void initState() {
+    super.initState();
+    list = widget.data['list'];
+    int id = widget.data['id'];
+    dealer = list?.data
+        ?.firstWhere((element) => element.dealers?.dealerId == id)
+        .dealers;
+    for (WarrantyModel model in (list?.data ?? [])) {
+      if (model.dealers?.dealerId == id) {
+        filteredList.add(model);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    SnackBarService.instance.buildContext = context;
+    _api = Provider.of<ApiProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Dealer Name',
+          '${dealer?.dealerName}',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
@@ -43,10 +74,11 @@ class _DealerDetailState extends State<DealerDetail> {
                 itemBuilder: (context, index) => ListTile(
                       tileColor: Colors.white,
                       title: Text(
-                        '200 WUGL-A-58X200-10',
+                        '${filteredList.elementAt(index).itemDescription}',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      subtitle: Text('Serial Number : 221548$index'),
+                      subtitle: Text(
+                          'Serial Number : ${filteredList.elementAt(index).warrantySerialNo}'),
                       trailing: IconButton(
                         onPressed: () {
                           AwesomeDialog(
@@ -55,11 +87,34 @@ class _DealerDetailState extends State<DealerDetail> {
                             animType: AnimType.bottomSlide,
                             title: 'Are you sure?',
                             desc:
-                                'You are about to unassign Serial Number : 221548$index from this dealer.',
+                                'You are about to unassign Serial Number : ${filteredList.elementAt(index).warrantySerialNo} from this dealer.',
                             onDismissCallback: (type) {},
                             autoDismiss: false,
-                            btnOkOnPress: () {
-                              Navigator.pop(context);
+                            btnOkOnPress: () async {
+                              await _api
+                                  .deleteWarrantyRequest(filteredList
+                                          .elementAt(index)
+                                          .warrantySerialNo ??
+                                      '')
+                                  .then((value) {
+                                if (value) {
+                                  Navigator.pop(context);
+                                  AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.success,
+                                    animType: AnimType.bottomSlide,
+                                    title: 'Success',
+                                    desc: 'Serial number unassigned',
+                                    onDismissCallback: (type) {},
+                                    autoDismiss: false,
+                                    btnOkOnPress: () {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    },
+                                    btnOkColor: primaryColor,
+                                  ).show();
+                                }
+                              });
                             },
                             btnCancelOnPress: () {
                               Navigator.pop(context);
@@ -77,7 +132,7 @@ class _DealerDetailState extends State<DealerDetail> {
                 separatorBuilder: (context, index) => const Divider(
                       color: dividerColor,
                     ),
-                itemCount: 28),
+                itemCount: filteredList.length),
           ),
         )
       ],
@@ -99,14 +154,13 @@ class _DealerDetailState extends State<DealerDetail> {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             verticalGap(defaultPadding * 0.5),
-            cardLargeDetail(context, 'Count', '28'),
-            cardLargeDetail(context, 'Dealer', 'Dealer Full Name'),
-            cardLargeDetail(context, 'Business', 'ABC Enterprise Pvt. Ltd.'),
-            cardLargeDetail(context, 'Phone', '9801265744'),
-            cardLargeDetail(context, 'Sold on', '15 Jun 2023'),
-            cardLargeDetail(context, 'Place', 'Chennai'),
-            cardLargeDetail(context, 'Address',
-                'Cathedral Rd, Parthasarathypuram, Teynampet, Chennai, Tamil Nadu - 600018'),
+            cardLargeDetail(context, 'Count', '${filteredList.length}'),
+            cardLargeDetail(context, 'Dealer', '${dealer?.dealerName}'),
+            cardLargeDetail(context, 'Business', '${dealer?.businessName}'),
+            cardLargeDetail(context, 'Phone', '${dealer?.mobileNo}'),
+            cardLargeDetail(context, 'Email', '${dealer?.email}'),
+            cardLargeDetail(
+                context, 'Address', prepareAddress(dealer?.address)),
           ],
         ),
       ),

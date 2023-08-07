@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:saur_stockist/screens/devices/assigned_devices.dart';
 import 'package:saur_stockist/screens/devices/unassigned_devices.dart';
+import 'package:saur_stockist/utils/preference_key.dart';
 
+import '../../model/model_list/warranty_request_list.dart';
+import '../../service/api_service.dart';
 import '../../utils/colors.dart';
 
 class DevicesScreen extends StatefulWidget {
@@ -15,11 +18,15 @@ class _DevicesScreenState extends State<DevicesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+  
   }
+
+ 
 
   @override
   void dispose() {

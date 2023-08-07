@@ -225,30 +225,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
           ),
         ),
-        Positioned(
-          bottom: 1,
-          right: 1,
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: primaryColor,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 3,
-                ),
-              ),
-              child: const Icon(
-                Icons.edit,
-                color: Colors.white,
-                size: 15,
-              ),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 1,
+        //   right: 1,
+        //   child: InkWell(
+        //     onTap: () {},
+        //     child: Container(
+        //       width: 40,
+        //       height: 40,
+        //       decoration: BoxDecoration(
+        //         color: primaryColor,
+        //         shape: BoxShape.circle,
+        //         border: Border.all(
+        //           color: Colors.white,
+        //           width: 3,
+        //         ),
+        //       ),
+        //       child: const Icon(
+        //         Icons.edit,
+        //         color: Colors.white,
+        //         size: 15,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

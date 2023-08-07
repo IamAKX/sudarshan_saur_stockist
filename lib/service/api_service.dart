@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/model/model_list/dealer_list_model.dart';
 import 'package:saur_stockist/model/model_list/stockist_list_model.dart';
 
 import '../main.dart';
+import '../model/model_list/warranty_request_list.dart';
 import '../model/user_model.dart';
 import '../utils/api.dart';
 import '../utils/enum.dart';
@@ -308,5 +310,186 @@ class ApiProvider extends ChangeNotifier {
     status = ApiStatus.failed;
     notifyListeners();
     return list;
+  }
+
+  Future<WarrantyRequestList?> getWarrantyRequestListFromCrm(
+      String stockistPhone) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    WarrantyRequestList? list;
+    try {
+      Response response = await _dio.get(
+        '${Api.getWarrantFromCrm}$stockistPhone',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        list = WarrantyRequestList.fromMap(response.data);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return list;
+  }
+
+  Future<DealerListModel?> getAllDealers() async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    DealerListModel? list;
+    try {
+      Response response = await _dio.get(
+        Api.dealers,
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        list = DealerListModel.fromMap(response.data);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return list;
+  }
+
+  Future<bool> allocateToDealer(List reqBody) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    debugPrint(json.encode(reqBody));
+    try {
+      Response response = await _dio.post(
+        Api.allocateToDealers,
+        data: json.encode(reqBody),
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        status = ApiStatus.success;
+        notifyListeners();
+        return true;
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return false;
+  }
+
+  Future<WarrantyRequestList?> getWarrantyRequestListByStockist(
+      int stockistId) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    WarrantyRequestList? list;
+    try {
+      Response response = await _dio.get(
+        '${Api.warrantyByStockist}$stockistId',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        list = WarrantyRequestList.fromMap(response.data);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return list;
+  }
+
+  Future<bool> deleteWarrantyRequest(String id) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    debugPrint(
+      '${Api.deleteWarrantyRequest}$id',
+    );
+    try {
+      Response response = await _dio.delete(
+        '${Api.deleteWarrantyRequest}$id',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      log(response.statusCode.toString());
+      if (response.statusCode == 204) {
+        status = ApiStatus.success;
+        notifyListeners();
+        return true;
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return false;
   }
 }

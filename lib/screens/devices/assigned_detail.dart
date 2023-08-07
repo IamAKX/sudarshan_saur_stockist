@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/model/warranty_model.dart';
+import 'package:saur_stockist/utils/date_time_formatter.dart';
+import 'package:saur_stockist/utils/helper_method.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/theme.dart';
@@ -6,8 +9,9 @@ import '../../widgets/gaps.dart';
 
 class AssignedDetail extends StatefulWidget {
   static const String routePath = '/assignedDetail';
+  final WarrantyModel warrantyModel;
 
-  const AssignedDetail({super.key});
+  const AssignedDetail({super.key, required this.warrantyModel});
 
   @override
   State<AssignedDetail> createState() => _AssignedDetailState();
@@ -52,13 +56,20 @@ class _AssignedDetailState extends State<AssignedDetail> {
             cardLargeDetail(
               context,
               'System info',
-              '200 WUGL-A 58X2100-10 Guarantee*',
+              '${widget.warrantyModel.itemDescription}',
             ),
-            cardLargeDetail(context, 'Serial No', '136283837'),
-            cardLargeDetail(context, 'Brand', 'Saur Sudarshan'),
-            cardLargeDetail(context, 'Model No', '58X2100'),
-            cardLargeDetail(context, 'Capacity', '25L'),
-            cardLargeDetail(context, 'Manufacture', '21 Feb, 2023'),
+            cardLargeDetail(context, 'Serial No',
+                '${widget.warrantyModel.warrantySerialNo}'),
+            cardLargeDetail(context, 'Guarantee',
+                '${widget.warrantyModel.guaranteePeriod}'),
+            cardLargeDetail(
+                context, 'Model No', '${widget.warrantyModel.model}'),
+            cardLargeDetail(context, 'LPD', '${widget.warrantyModel.lpd}'),
+            cardLargeDetail(
+                context,
+                'Installed on',
+                DateTimeFormatter.onlyDateShort(
+                    widget.warrantyModel.installationDate ?? '')),
           ],
         ),
       ),
@@ -80,13 +91,17 @@ class _AssignedDetailState extends State<AssignedDetail> {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             verticalGap(defaultPadding * 0.5),
-            cardLargeDetail(context, 'Dealer', 'Dealer Full Name'),
-            cardLargeDetail(context, 'Business', 'ABC Enterprise Pvt. Ltd.'),
-            cardLargeDetail(context, 'Phone', '9801265744'),
-            cardLargeDetail(context, 'Sold on', '15 Jun 2023'),
-            cardLargeDetail(context, 'Place', 'Chennai'),
+            cardLargeDetail(context, 'Dealer',
+                '${widget.warrantyModel.dealers?.dealerName}'),
+            cardLargeDetail(context, 'Business',
+                '${widget.warrantyModel.dealers?.businessName}'),
+            cardLargeDetail(
+                context, 'Phone', '${widget.warrantyModel.dealers?.mobileNo}'),
+            cardLargeDetail(
+                context, 'Email', '${widget.warrantyModel.dealers?.email}'),
+            cardLargeDetail(context, 'Place', '${widget.warrantyModel.state}'),
             cardLargeDetail(context, 'Address',
-                'Cathedral Rd, Parthasarathypuram, Teynampet, Chennai, Tamil Nadu - 600018'),
+                prepareAddress(widget.warrantyModel.dealers?.address)),
           ],
         ),
       ),
