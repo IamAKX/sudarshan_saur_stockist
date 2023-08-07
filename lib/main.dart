@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:saur_stockist/model/user_model.dart';
@@ -12,6 +13,8 @@ import 'package:saur_stockist/utils/router.dart';
 import 'package:saur_stockist/utils/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'utils/date_time_formatter.dart';
+
 late SharedPreferences prefs;
 UserModel? userModel;
 Future<void> main() async {
@@ -20,7 +23,12 @@ Future<void> main() async {
   if (prefs.getInt(SharedpreferenceKey.userId) != null) {
     userModel = await ApiProvider()
         .getStockistById(prefs.getInt(SharedpreferenceKey.userId) ?? 0);
+    if (userModel != null) {
+      await ApiProvider().updateUser(
+          {'lastLogin': DateTimeFormatter.now()}, userModel?.stockistId ?? 0);
+    }
   }
+
   runApp(const MyApp());
 }
 

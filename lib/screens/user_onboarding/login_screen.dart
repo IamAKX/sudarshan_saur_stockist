@@ -14,6 +14,8 @@ import 'package:saur_stockist/widgets/primary_button.dart';
 
 import '../../service/api_service.dart';
 import '../../service/snakbar_service.dart';
+import '../../utils/enum.dart';
+import '../blocked_user/blocked_users_screen.dart';
 import '../home_container/home_container.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -109,12 +111,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       base64.encode(_passwordCtrl.text.codeUnits),
                     )
                         .then((value) {
-                      if (value) {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          HomeContainer.routePath,
-                          (route) => false,
-                        );
+                      if (value != null) {
+                        if (value.status == UserStatus.ACTIVE.name) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            HomeContainer.routePath,
+                            (route) => false,
+                          );
+                        } else {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            BlockedUserScreen.routePath,
+                            (route) => false,
+                          );
+                        }
                       }
                     });
                   },

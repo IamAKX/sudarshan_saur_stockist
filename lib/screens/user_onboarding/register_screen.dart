@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int step = 1;
 
   late ApiProvider _api;
+  String code = '';
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +189,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 250,
                     child: PrimaryButton(
                         onPressed: () async {
-                          if (_otpCodeCtrl.text == '1234') {
+                          if (code != '' && _otpCodeCtrl.text == code) {
+                            step = 1;
                             UserModel user = UserModel(
                               address: AddressModel(
                                 addressLine1: addressLine1Ctrl.text,
@@ -206,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               businessAddress: _businessAddressCtrl.text,
                               businessName: _businessNameCtrl.text,
                               gstNumber: _gstNumberCtrl.text,
-                              status: UserStatus.BLOCKED.name,
+                              status: UserStatus.CREATED.name,
                             );
 
                             _api.createUser(user).then((value) {
@@ -257,9 +260,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           gstNumberCtrl: _gstNumberCtrl,
         );
       case 4:
+        code = (Random().nextInt(9000) + 1000).toString();
+        ApiProvider().sendOtp(_phoneCtrl.text, code.toString());
         return OtpVerification(
           phoneCtrl: _phoneCtrl,
-          otpCode: '1234',
+          otpCode: code,
           otpCodeCtrl: _otpCodeCtrl,
         );
       default:
