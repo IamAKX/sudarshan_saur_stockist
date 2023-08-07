@@ -1,12 +1,21 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:saur_stockist/model/model_list/stockist_list_model.dart';
 import 'package:saur_stockist/screens/password_recovery/new_password.dart';
 import 'package:saur_stockist/screens/password_recovery/registered_phone_number.dart';
 import 'package:saur_stockist/screens/user_onboarding/otp_verification.dart';
 
+import '../../main.dart';
+import '../../service/api_service.dart';
+import '../../service/snakbar_service.dart';
 import '../../utils/colors.dart';
 import '../../utils/theme.dart';
 import '../../widgets/gaps.dart';
 import '../../widgets/primary_button.dart';
+import '../user_onboarding/login_screen.dart';
 
 class RecoverPasswordScreen extends StatefulWidget {
   const RecoverPasswordScreen({super.key});
@@ -24,7 +33,9 @@ class _RecoverPasswordScreenState extends State<RecoverPasswordScreen>
   final TextEditingController _phoneCtrl = TextEditingController();
   final TextEditingController _otpCodeCtrl = TextEditingController();
   int step = 1;
-
+  String code = '';
+  late ApiProvider _api;
+  StockistListModel? stockistListModel;
   @override
   void initState() {
     super.initState();
@@ -39,6 +50,8 @@ class _RecoverPasswordScreenState extends State<RecoverPasswordScreen>
 
   @override
   Widget build(BuildContext context) {
+    SnackBarService.instance.buildContext = context;
+    _api = Provider.of<ApiProvider>(context);
     return Scaffold(
       body: getBody(context),
     );
@@ -149,7 +162,22 @@ class _RecoverPasswordScreenState extends State<RecoverPasswordScreen>
                 Visibility(
                   visible: (step == 1 || step == 2),
                   child: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      if (step == 1) {
+                        stockistListModel =
+                            await _api.getStockistMobileNumber(_phoneCtrl.text);
+                        if (stockistListModel == null ||
+                            stockistListModel?.data == null ||
+                            (stockistListModel?.data?.isEmpty ?? true)) {
+                          return;
+                        }
+                      } else if (step == 2) {
+                        if (code == '' || _otpCodeCtrl.text != code) {
+                          SnackBarService.instance
+                              .showSnackBarError('Invalid OTP');
+                          return;
+                        }
+                      }
                       setState(() {
                         step += 1;
                       });
@@ -169,11 +197,31 @@ class _RecoverPasswordScreenState extends State<RecoverPasswordScreen>
                     width: 250,
                     child: PrimaryButton(
                         onPressed: () {
-                          debugPrint(_otpCodeCtrl.text);
+                          if (code != '' && _otpCodeCtrl.text != code) {
+                            SnackBarService.instance
+                                .showSnackBarError('Invalid OTP');
+                            return;
+                          }
+                          Map<String, dynamic> map = {
+                            'password':
+                                base64.encode(_passwordCtrl.text.codeUnits),
+                          };
+                          _api
+                              .updateUser(
+                                  map,
+                                  stockistListModel?.data?.first.stockistId ??
+                                      -1)
+                              .then((value) async {
+                            if (value) {
+                              prefs.clear();
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  LoginScreen.routePath, (route) => false);
+                            }
+                          });
                         },
                         label: 'Change',
-                        isDisabled: false,
-                        isLoading: false),
+                        isDisabled: _api.status == ApiStatus.loading,
+                        isLoading: _api.status == ApiStatus.loading),
                   ),
                 ),
               ],
@@ -190,8 +238,10 @@ class _RecoverPasswordScreenState extends State<RecoverPasswordScreen>
       case 1:
         return RegisteredPhoneNumber(phoneCtrl: _phoneCtrl);
       case 2:
+        code = (Random().nextInt(9000) + 1000).toString();
+        ApiProvider().sendOtp(_phoneCtrl.text, code.toString());
         return OtpVerification(
-            phoneCtrl: _phoneCtrl, otpCode: '1234', otpCodeCtrl: _otpCodeCtrl);
+            phoneCtrl: _phoneCtrl, otpCode: code, otpCodeCtrl: _otpCodeCtrl);
       case 3:
         return NewPassword(passwordCtrl: _passwordCtrl);
       default:
