@@ -12,6 +12,7 @@ dependencies:
   cached_network_image: any
   cupertino_icons: ^1.0.2
   dio: ^5.2.1+1
+  dropdown_button2: ^2.3.9
   firebase_core: ^2.15.0
   firebase_storage: ^11.2.5
   flashy_tab_bar2: ^0.0.6

@@ -15,8 +15,7 @@ class UserModel {
   String? image;
   String? businessName;
   String? gstNumber;
-  String? password;
-  String? businessAddress;
+  String? stockistCode;
   UserModel({
     this.stockistId,
     this.stockistName,
@@ -30,8 +29,7 @@ class UserModel {
     this.image,
     this.businessName,
     this.gstNumber,
-    this.password,
-    this.businessAddress,
+    this.stockistCode,
   });
 
   UserModel copyWith({
@@ -47,8 +45,7 @@ class UserModel {
     String? image,
     String? businessName,
     String? gstNumber,
-    String? password,
-    String? businessAddress,
+    String? stockistCode,
   }) {
     return UserModel(
       stockistId: stockistId ?? this.stockistId,
@@ -63,8 +60,7 @@ class UserModel {
       image: image ?? this.image,
       businessName: businessName ?? this.businessName,
       gstNumber: gstNumber ?? this.gstNumber,
-      password: password ?? this.password,
-      businessAddress: businessAddress ?? this.businessAddress,
+      stockistCode: stockistCode ?? this.stockistCode,
     );
   }
 
@@ -82,8 +78,7 @@ class UserModel {
       'image': image,
       'businessName': businessName,
       'gstNumber': gstNumber,
-      'password': password,
-      'businessAddress': businessAddress,
+      'stockistCode': stockistCode,
     };
   }
 
@@ -101,8 +96,7 @@ class UserModel {
       image: map['image'],
       businessName: map['businessName'],
       gstNumber: map['gstNumber'],
-      password: map['password'],
-      businessAddress: map['businessAddress'],
+      stockistCode: map['stockistCode'],
     );
   }
 
@@ -112,7 +106,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(stockistId: $stockistId, stockistName: $stockistName, mobileNo: $mobileNo, status: $status, email: $email, address: $address, createdOn: $createdOn, updatedOn: $updatedOn, lastLogin: $lastLogin, image: $image, businessName: $businessName, gstNumber: $gstNumber, password: $password, businessAddress: $businessAddress)';
+    return 'UserModel(stockistId: $stockistId, stockistName: $stockistName, mobileNo: $mobileNo, status: $status, email: $email, address: $address, createdOn: $createdOn, updatedOn: $updatedOn, lastLogin: $lastLogin, image: $image, businessName: $businessName, gstNumber: $gstNumber, stockistCode: $stockistCode)';
   }
 
   @override
@@ -132,8 +126,7 @@ class UserModel {
       other.image == image &&
       other.businessName == businessName &&
       other.gstNumber == gstNumber &&
-      other.password == password &&
-      other.businessAddress == businessAddress;
+      other.stockistCode == stockistCode;
   }
 
   @override
@@ -150,7 +143,6 @@ class UserModel {
       image.hashCode ^
       businessName.hashCode ^
       gstNumber.hashCode ^
-      password.hashCode ^
-      businessAddress.hashCode;
+      stockistCode.hashCode;
   }
 }

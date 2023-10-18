@@ -36,19 +36,8 @@ class ApiProvider extends ChangeNotifier {
     status = ApiStatus.loading;
     notifyListeners();
     try {
-      Map<String, dynamic> reqBody = {
-        "stockistName": user.stockistName,
-        "password": user.password,
-        "mobileNo": user.mobileNo,
-        "status": user.status,
-        "email": user.email,
-        "address": user.address!.toMap(),
-        "image": user.image,
-        "lastLogin": user.lastLogin,
-        "businessName": user.businessName,
-        "businessAddress": user.businessAddress,
-        "gstNumber": user.gstNumber
-      };
+      Map<String, dynamic> reqBody = user.toMap();
+
       log('Request : ${json.encode(reqBody)}');
       Response response = await _dio.post(
         Api.users,

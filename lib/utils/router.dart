@@ -4,10 +4,12 @@ import 'package:saur_stockist/screens/dealers/dealer_detail.dart';
 import 'package:saur_stockist/screens/devices/assigned_detail.dart';
 import 'package:saur_stockist/screens/devices/new_assignment.dart';
 // import 'package:saur_stockist/screens/home_container/home_container.dart';
-import 'package:saur_stockist/screens/password_recovery/recover_password_screen.dart';
 import 'package:saur_stockist/screens/profile/change_password.dart';
 import 'package:saur_stockist/screens/profile/edit_profile.dart';
+import 'package:saur_stockist/screens/user_onboarding/address_screen.dart';
 import 'package:saur_stockist/screens/user_onboarding/agreement_screen.dart';
+import 'package:saur_stockist/screens/user_onboarding/business_detail.dart';
+import 'package:saur_stockist/screens/user_onboarding/change_phone.dart';
 import 'package:saur_stockist/screens/user_onboarding/login_screen.dart';
 import 'package:saur_stockist/screens/user_onboarding/register_screen.dart';
 
@@ -26,14 +28,19 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case AgreementScreen.routePath:
         return MaterialPageRoute(builder: (_) => const AgreementScreen());
-      case RecoverPasswordScreen.routePath:
-        return MaterialPageRoute(builder: (_) => const RecoverPasswordScreen());
+
       case HomeContainer.routePath:
         return MaterialPageRoute(builder: (_) => const HomeContainer());
       case EditProfile.routePath:
         return MaterialPageRoute(builder: (_) => const EditProfile());
-      case ChangePassword.routePath:
-        return MaterialPageRoute(builder: (_) => const ChangePassword());
+
+      case AddressScreen.routePath:
+        return MaterialPageRoute(builder: (_) => const AddressScreen());
+      case BusinessDetails.routePath:
+        return MaterialPageRoute(builder: (_) => const BusinessDetails());
+      case ChangePhoneNumber.routePath:
+        return MaterialPageRoute(builder: (_) => const ChangePhoneNumber());
+
       case DealerDetail.routePath:
         return MaterialPageRoute(
             builder: (_) => DealerDetail(

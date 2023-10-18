@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:saur_stockist/main.dart';
@@ -15,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../service/api_service.dart';
 import '../../service/snakbar_service.dart';
+import '../../service/storage_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,6 +30,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late ApiProvider _api;
   UserModel? user;
+  bool isImageUploading = false;
 
   @override
   void initState() {
@@ -86,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                 ),
                 Text(
-                  '${user?.email}',
+                  '${user?.mobileNo}',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(),
                 ),
               ],
@@ -117,23 +122,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 endIndent: defaultPadding,
                 indent: defaultPadding * 3,
               ),
-              ListTile(
-                tileColor: Colors.white,
-                leading: const Icon(
-                  LineAwesomeIcons.user_lock,
-                ),
-                title: const Text('Change Password'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.pushNamed(context, ChangePassword.routePath);
-                },
-              ),
-              const Divider(
-                height: 0,
-                color: dividerColor,
-                endIndent: defaultPadding,
-                indent: defaultPadding * 3,
-              ),
+              // ListTile(
+              //   tileColor: Colors.white,
+              //   leading: const Icon(
+              //     LineAwesomeIcons.user_lock,
+              //   ),
+              //   title: const Text('Change Password'),
+              //   trailing: const Icon(Icons.chevron_right),
+              //   onTap: () {
+              //     Navigator.pushNamed(context, ChangePassword.routePath);
+              //   },
+              // ),
+              // const Divider(
+              //   height: 0,
+              //   color: dividerColor,
+              //   endIndent: defaultPadding,
+              //   indent: defaultPadding * 3,
+              // ),
               ListTile(
                 tileColor: Colors.white,
                 leading: const Icon(
@@ -142,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: const Text('Contact Us'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
-                  launchUrl(Uri.parse('tel://18008800'));
+                  launchUrl(Uri.parse('tel://9225309153'));
                 },
               ),
               const Divider(
@@ -229,7 +234,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //   bottom: 1,
         //   right: 1,
         //   child: InkWell(
-        //     onTap: () {},
+        //     onTap: isImageUploading
+        //         ? null
+        //         : () async {
+        //             final ImagePicker picker = ImagePicker();
+        //             final XFile? image =
+        //                 await picker.pickImage(source: ImageSource.gallery);
+        //             if (image != null) {
+        //               File imageFile = File(image.path);
+        //               setState(() {
+        //                 isImageUploading = true;
+        //               });
+        //               StorageService.uploadProfileImage(
+        //                       imageFile, user!.stockistId!.toString())
+        //                   .then((value) async {
+        //                 _api.updateUser({'image': value},
+        //                     user?.stockistId ?? -1).then((value) {
+        //                   isImageUploading = false;
+        //                   reloadScreen();
+        //                 });
+        //               });
+        //             }
+        //           },
         //     child: Container(
         //       width: 40,
         //       height: 40,

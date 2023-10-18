@@ -3,35 +3,32 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saur_stockist/model/user_model.dart';
-import 'package:saur_stockist/screens/user_onboarding/address_screen.dart';
-import 'package:saur_stockist/service/api_service.dart';
-import 'package:saur_stockist/utils/enum.dart';
-import 'package:saur_stockist/utils/theme.dart';
-import 'package:saur_stockist/widgets/gaps.dart';
+import 'package:saur_stockist/model/model_list/stockist_list_model.dart';
 import 'package:string_validator/string_validator.dart';
 
+import '../../service/api_service.dart';
 import '../../service/snakbar_service.dart';
 import '../../utils/colors.dart';
 import '../../utils/helper_method.dart';
+import '../../utils/theme.dart';
+import '../../widgets/gaps.dart';
 import '../../widgets/input_field_dark.dart';
 import '../../widgets/primary_button.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
-  static const String routePath = '/register';
-  static bool agreementStatus = false;
+class ChangePhoneNumber extends StatefulWidget {
+  const ChangePhoneNumber({super.key});
+  static const String routePath = '/changePhoneNumber';
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<ChangePhoneNumber> createState() => _ChangePhoneNumberState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _nameCtrl = TextEditingController();
+class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
   final TextEditingController _phoneCtrl = TextEditingController();
-  final TextEditingController _stockistCode = TextEditingController();
+  final TextEditingController _newPhoneCtrl = TextEditingController();
   final TextEditingController _otpCodeCtrl = TextEditingController();
 
+  StockistListModel? customerListModel;
   late ApiProvider _api;
   String code = '';
 
@@ -56,10 +53,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     SnackBarService.instance.buildContext = context;
     _api = Provider.of<ApiProvider>(context);
-
     return Scaffold(
       body: getBody(context),
     );
@@ -97,27 +103,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             verticalGap(defaultPadding),
             Text(
-              'New\nAccount 🙋🏼‍♂️',
+              'Change Mobile\nNumber',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            verticalGap(defaultPadding * 1.5),
             Expanded(
               child: ListView(
                 children: [
                   InputFieldDark(
-                    hint: 'Full Name',
-                    controller: _nameCtrl,
-                    keyboardType: TextInputType.name,
+                    hint: 'Old Mobile Number',
+                    controller: _phoneCtrl,
+                    keyboardType: TextInputType.phone,
                     obscure: false,
-                    icon: LineAwesomeIcons.user,
+                    icon: LineAwesomeIcons.phone,
                   ),
                   verticalGap(defaultPadding * 1.5),
                   InputFieldDark(
-                    hint: 'Mobile Number',
-                    controller: _phoneCtrl,
+                    hint: 'New Mobile Number',
+                    controller: _newPhoneCtrl,
                     keyboardType: TextInputType.phone,
                     obscure: false,
                     icon: LineAwesomeIcons.phone,
@@ -134,9 +139,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     'Enter valid 10 digit mobile number');
                                 return;
                               }
-                              code = getOTPCode();
                               startTimer();
-                              _api.sendOtp(_phoneCtrl.text, code);
+                              code = getOTPCode();
+                              _api.sendOtp(_newPhoneCtrl.text, code);
                             },
                       child: Text(
                         _timerActive
@@ -157,66 +162,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscure: false,
                     icon: LineAwesomeIcons.lock,
                   ),
-                  verticalGap(defaultPadding * 1.5),
-                  InputFieldDark(
-                    hint: 'Stockist Code',
-                    controller: _stockistCode,
-                    keyboardType: TextInputType.number,
-                    obscure: false,
-                    icon: LineAwesomeIcons.plug,
-                    maxChar: 6,
-                  ),
                   verticalGap(defaultPadding * 2),
                   PrimaryButton(
-                    onPressed: () async {
-                      if (_nameCtrl.text.isEmpty ||
-                          _phoneCtrl.text.isEmpty ||
-                          _otpCodeCtrl.text.isEmpty ||
-                          _stockistCode.text.isEmpty) {
-                        SnackBarService.instance
-                            .showSnackBarError('All fields are mandatory');
-                        return;
-                      }
+                    onPressed: () {
+                      if (_otpCodeCtrl.text == code) {
+                        _api
+                            .getStockistMobileNumber(_phoneCtrl.text)
+                            .then((value) {
+                          if (value == null || (value.data?.isEmpty ?? true)) {
+                            SnackBarService.instance.showSnackBarError(
+                                'User not found with ${_phoneCtrl.text}, failed to update');
+                            return;
+                          }
 
-                      if (!isValidPhoneNumber(_phoneCtrl.text)) {
-                        SnackBarService.instance
-                            .showSnackBarError('Invalid phone number');
-                        return;
-                      }
-
-                      if (_stockistCode.text.isEmpty) {
-                        SnackBarService.instance
-                            .showSnackBarError('Invalid Serial number');
-                        return;
-                      }
-
-                      if (_otpCodeCtrl.text != code) {
+                          Map<String, dynamic> map = {
+                            "mobileNo": _phoneCtrl.text
+                          };
+                          _api
+                              .updateUser(
+                                  map, value.data?.first.stockistId ?? -1)
+                              .then((value) async {
+                            if (value) {
+                              SnackBarService.instance.showSnackBarSuccess(
+                                  'Phone number updated, login with new number');
+                              Navigator.pop(context);
+                            }
+                          });
+                        });
+                      } else {
                         SnackBarService.instance
                             .showSnackBarError('Incorrect OTP');
-                        return;
                       }
-
-                      // TODO : Check stockist code and phone is valid
-                      // if (warrantyModel == null) {
-                      //   SnackBarService.instance
-                      //       .showSnackBarError('Invalid serial number');
-                      //   return;
-                      // }
-                      UserModel userModel = UserModel(
-                        stockistName: _nameCtrl.text,
-                        mobileNo: _phoneCtrl.text,
-                        stockistCode: _stockistCode.text,
-                        status: UserStatus.CREATED.name,
-                      );
-
-                      _api.createUser(userModel).then((value) {
-                        if (value) {
-                          Navigator.pushNamedAndRemoveUntil(context,
-                              AddressScreen.routePath, (route) => false);
-                        }
-                      });
                     },
-                    label: 'Register',
+                    label: 'Change Mobile Number',
                     isDisabled: _api.status == ApiStatus.loading,
                     isLoading: _api.status == ApiStatus.loading,
                   ),
@@ -228,9 +206,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  bool validateInput() {
-    return true;
   }
 }
