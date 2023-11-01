@@ -78,9 +78,9 @@ class _DealersScreenState extends State<DealersScreen> {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           actions: const [
-            AppBarSearchButton(
-              buttonHasTwoStates: false,
-            )
+            // AppBarSearchButton(
+            //   buttonHasTwoStates: false,
+            // )
           ],
         ),
       ),

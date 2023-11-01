@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:saur_stockist/main.dart';
 import 'package:saur_stockist/screens/home_container/home_container.dart';
+import 'package:saur_stockist/screens/user_onboarding/login_screen.dart';
 
 import '../../model/user_model.dart';
 import '../../service/api_service.dart';
@@ -58,8 +60,18 @@ class _BusinessDetailsState extends State<BusinessDetails> {
                 if (!isValidInputs()) {
                   return;
                 }
-                Navigator.pushNamedAndRemoveUntil(
-                    context, HomeContainer.routePath, (route) => false);
+                _api.updateUser({
+                  'businessName': _businessNameCtrl.text,
+                  'gstNumber': _gstCtrl.text,
+                }, user?.stockistId ?? -1).then((value) {
+                  if (value) {
+                    SnackBarService.instance.showSnackBarSuccess(
+                        'Registration complete. Please login');
+                    prefs.clear();
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, LoginScreen.routePath, (route) => false);
+                  }
+                });
               },
               child: const Text('Next'),
             ),

@@ -161,6 +161,7 @@ class ApiProvider extends ChangeNotifier {
     status = ApiStatus.loading;
     notifyListeners();
     UserModel? userModel;
+    log('${Api.users}/$id');
     try {
       Response response = await _dio.get(
         '${Api.users}/$id',
@@ -378,7 +379,7 @@ class ApiProvider extends ChangeNotifier {
     debugPrint(json.encode(reqBody));
     try {
       Response response = await _dio.post(
-        Api.allocateToDealers,
+        Api.allocateToDealer,
         data: json.encode(reqBody),
         options: Options(
           contentType: 'application/json',
@@ -480,5 +481,75 @@ class ApiProvider extends ChangeNotifier {
     status = ApiStatus.failed;
     notifyListeners();
     return false;
+  }
+
+  Future<bool> validateStockist(String phone, String code) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    try {
+      Response response = await _dio.get(
+        '${Api.validateStockist}dealer_code=$code&mobile_number=$phone',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        status = ApiStatus.success;
+        notifyListeners();
+        return true;
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return false;
+  }
+
+  Future<WarrantyRequestList?> getWarrantyListFromCrm(UserModel user) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    WarrantyRequestList? list;
+    try {
+      log('${Api.getWarrantyByStockistCode}dealer_code=${user.stockistCode}&mobile_number=${user.mobileNo}');
+      Response response = await _dio.get(
+        '${Api.getWarrantyByStockistCode}dealer_code=${user.stockistCode}&mobile_number=${user.mobileNo}',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        list = WarrantyRequestList.fromMap(response.data);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return list;
   }
 }

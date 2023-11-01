@@ -189,11 +189,8 @@ class _NewAssignmentState extends State<NewAssignment> {
                 for (WarrantyModel model in widget.warranty.values) {
                   var item = {
                     "warrantySerialNo": model.warrantySerialNo,
-                    "allocationStatus": "ALLOCATED",
-                    "initiatedBy": SharedpreferenceKey.getUserId(),
-                    "approvedBy": "STOCKIST",
-                    "dealers": {"dealerId": _selectedDealerId},
-                    "stockists": {"stockistId": SharedpreferenceKey.getUserId()}
+                    "dealerId": _selectedDealerId,
+                    "stockistId": SharedpreferenceKey.getUserId()
                   };
                   reqBody.add(item);
                 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:saur_stockist/screens/dealers/dealers_screen.dart';
 import 'package:saur_stockist/screens/devices/devices_screen.dart';
 
+import '../devices/unassigned_devices.dart';
 import '../profile/profile_screen.dart';
 
 class HomeContainer extends StatefulWidget {
@@ -33,13 +34,13 @@ class _HomeContainerState extends State<HomeContainer> {
         items: [
           FlashyTabBarItem(
             icon: const Icon(
-              Icons.storefront_sharp,
+              Icons.playlist_add_check_circle_outlined,
             ),
-            title: const Text('Dealers'),
+            title: const Text('Allocated'),
           ),
           FlashyTabBarItem(
-            icon: const Icon(Icons.storage_outlined),
-            title: const Text('Devices'),
+            icon: const Icon(Icons.playlist_add_circle_outlined),
+            title: const Text('Unllocated'),
           ),
           FlashyTabBarItem(
             icon: const Icon(Icons.person_outline_outlined),
@@ -55,7 +56,7 @@ class _HomeContainerState extends State<HomeContainer> {
       case 0:
         return const DealersScreen();
       case 1:
-        return const DevicesScreen();
+        return const UnassignedDevice(); //const DevicesScreen();
       case 2:
         return const ProfileScreen();
       default:

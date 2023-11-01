@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class AddressModel {
-   String? houseNo;
+  String? houseNo;
   String? area;
   String? street1;
   String? street2;
@@ -88,7 +88,8 @@ class AddressModel {
 
   String toJson() => json.encode(toMap());
 
-  factory AddressModel.fromJson(String source) => AddressModel.fromMap(json.decode(source));
+  factory AddressModel.fromJson(String source) =>
+      AddressModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -98,33 +99,33 @@ class AddressModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is AddressModel &&
-      other.houseNo == houseNo &&
-      other.area == area &&
-      other.street1 == street1 &&
-      other.street2 == street2 &&
-      other.landmark == landmark &&
-      other.town == town &&
-      other.taluk == taluk &&
-      other.state == state &&
-      other.country == country &&
-      other.zipCode == zipCode &&
-      other.district == district;
+        other.houseNo == houseNo &&
+        other.area == area &&
+        other.street1 == street1 &&
+        other.street2 == street2 &&
+        other.landmark == landmark &&
+        other.town == town &&
+        other.taluk == taluk &&
+        other.state == state &&
+        other.country == country &&
+        other.zipCode == zipCode &&
+        other.district == district;
   }
 
   @override
   int get hashCode {
     return houseNo.hashCode ^
-      area.hashCode ^
-      street1.hashCode ^
-      street2.hashCode ^
-      landmark.hashCode ^
-      town.hashCode ^
-      taluk.hashCode ^
-      state.hashCode ^
-      country.hashCode ^
-      zipCode.hashCode ^
-      district.hashCode;
+        area.hashCode ^
+        street1.hashCode ^
+        street2.hashCode ^
+        landmark.hashCode ^
+        town.hashCode ^
+        taluk.hashCode ^
+        state.hashCode ^
+        country.hashCode ^
+        zipCode.hashCode ^
+        district.hashCode;
   }
 }

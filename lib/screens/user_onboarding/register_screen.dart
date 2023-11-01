@@ -97,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             verticalGap(defaultPadding),
             Text(
-              'New\nAccount 🙋🏼‍♂️',
+              'New\nAccount',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   InputFieldDark(
                     hint: 'Stockist Code',
                     controller: _stockistCode,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     obscure: false,
                     icon: LineAwesomeIcons.plug,
                     maxChar: 6,
@@ -197,11 +197,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       }
 
                       // TODO : Check stockist code and phone is valid
-                      // if (warrantyModel == null) {
-                      //   SnackBarService.instance
-                      //       .showSnackBarError('Invalid serial number');
-                      //   return;
-                      // }
+                      if (!(await _api.validateStockist(
+                          _phoneCtrl.text, _stockistCode.text))) {
+                        return;
+                      }
                       UserModel userModel = UserModel(
                         stockistName: _nameCtrl.text,
                         mobileNo: _phoneCtrl.text,

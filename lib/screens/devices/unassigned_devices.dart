@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:app_bar_with_search_switch/app_bar_with_search_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -38,16 +41,16 @@ class _UnassignedDeviceState extends State<UnassignedDevice> {
   reloadUser() async {
     await _api
         .getStockistById(prefs.getInt(SharedpreferenceKey.userId) ?? -1)
-        .then((value) {
-      setState(() async {
-        user = value;
-        if (user != null) {
-          SnackBarService.instance.showSnackBarInfo(
-              'This is taking longer than usual, please wait...');
-          list = await _api.getWarrantyRequestListFromCrm(user?.mobileNo ?? '');
-        }
-      });
+        .then((value) async {
+      user = value;
+      if (user != null) {
+        // SnackBarService.instance.showSnackBarInfo(
+        //     'This is taking longer than usual, please wait...');
+        list = await _api.getWarrantyListFromCrm(user!);
+      }
     });
+
+    setState(() {});
   }
 
   addToList(WarrantyModel? warranty) {
@@ -68,6 +71,26 @@ class _UnassignedDeviceState extends State<UnassignedDevice> {
     _api = Provider.of<ApiProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBarWithSearchSwitch(
+        actionsIconTheme: const IconThemeData(color: primaryColor),
+        keepAppBarColors: false,
+        backgroundColor: Colors.white,
+        animation: (child) => AppBarAnimationSlideLeft(
+            milliseconds: 600, withFade: false, percents: 1.0, child: child),
+        onChanged: (value) {},
+        appBarBuilder: (context) => AppBar(
+          title: Text(
+            'Unallocated Device',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          actions: const [
+            // AppBarSearchButton(
+            //   buttonHasTwoStates: false,
+            // )
+          ],
+        ),
+      ),
       body: _api.status == ApiStatus.loading
           ? const Center(
               child: Column(
@@ -122,15 +145,19 @@ class _UnassignedDeviceState extends State<UnassignedDevice> {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Checkbox(
-                value: selectedIndex.length == list?.data?.length,
+                value: selectedIndex.keys.length ==
+                    list?.data?.map((e) => e.warrantySerialNo).toSet().length,
                 onChanged: (value) {
+                  log('selectedIndex.keys.length = ${selectedIndex.keys.length}');
+                  log('list?.data?.map((e) => e.warrantySerialNo).toSet().length = ${list?.data?.map((e) => e.warrantySerialNo).toSet().length}');
                   setState(() {
+                    selectedIndex = {};
                     if (value ?? false) {
                       list?.data?.forEach((element) {
                         addToList(element);
                       });
                     } else {
-                      selectedIndex.clear();
+                      // selectedIndex = {};
                     }
                   });
                 },

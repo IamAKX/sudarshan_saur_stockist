@@ -1,4 +1,5 @@
 class Constants {
+  
   static Map<String, dynamic> stateDistrictRaw = {
     "states": [
       {
