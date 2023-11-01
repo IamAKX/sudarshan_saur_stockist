@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/model/allocated_model.dart';
 import 'package:saur_stockist/screens/blocked_user/blocked_users_screen.dart';
 import 'package:saur_stockist/screens/dealers/dealer_detail.dart';
 import 'package:saur_stockist/screens/devices/assigned_detail.dart';
@@ -44,7 +45,7 @@ class NavRoute {
       case DealerDetail.routePath:
         return MaterialPageRoute(
             builder: (_) => DealerDetail(
-                  data: settings.arguments as Map<String, dynamic>,
+                  data: settings.arguments as AllocatedModel,
                 ));
       case AssignedDetail.routePath:
         return MaterialPageRoute(

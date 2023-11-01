@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
+import 'package:saur_stockist/model/model_list/allocated_list.dart';
 import 'package:saur_stockist/model/model_list/dealer_list_model.dart';
 import 'package:saur_stockist/model/model_list/stockist_list_model.dart';
+import 'package:saur_stockist/model/warranty_model.dart';
 
 import '../main.dart';
 import '../model/model_list/warranty_request_list.dart';
@@ -551,5 +553,75 @@ class ApiProvider extends ChangeNotifier {
     status = ApiStatus.failed;
     notifyListeners();
     return list;
+  }
+
+  Future<AllocatedList?> getAllocatedWarrantyList(int stockistId) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    AllocatedList? list;
+    try {
+      Response response = await _dio.get(
+        '${Api.allocateToDealer}stockist/$stockistId',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        list = AllocatedList.fromMap(response.data);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      SnackBarService.instance
+          .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return list;
+  }
+
+  Future<WarrantyModel?> getSerialDetailFromCrm(String serial) async {
+    status = ApiStatus.loading;
+    notifyListeners();
+    WarrantyModel? model;
+    try {
+      Response response = await _dio.get(
+        '${Api.deviceDetailFromCrm}$serial',
+        options: Options(
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+        ),
+      );
+      if (response.statusCode == 200) {
+        model = WarrantyModel.fromMap(response.data['data']);
+        status = ApiStatus.success;
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      status = ApiStatus.failed;
+      var resBody = e.response?.data ?? {};
+      log(e.response?.data.toString() ?? e.response.toString());
+      notifyListeners();
+      // SnackBarService.instance
+      //     .showSnackBarError('Error : ${resBody['message']}');
+    } catch (e) {
+      status = ApiStatus.failed;
+      notifyListeners();
+      // SnackBarService.instance.showSnackBarError(e.toString());
+      log(e.toString());
+    }
+    status = ApiStatus.failed;
+    notifyListeners();
+    return model;
   }
 }

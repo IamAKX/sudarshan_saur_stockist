@@ -2,7 +2,9 @@ import 'package:app_bar_with_search_switch/app_bar_with_search_switch.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:saur_stockist/model/allocated_model.dart';
 import 'package:saur_stockist/model/dealer_short_model.dart';
+import 'package:saur_stockist/model/model_list/allocated_list.dart';
 import 'package:saur_stockist/model/warranty_model.dart';
 import 'package:saur_stockist/screens/dealers/dealer_detail.dart';
 import 'package:saur_stockist/utils/theme.dart';
@@ -11,6 +13,7 @@ import '../../model/model_list/warranty_request_list.dart';
 import '../../service/api_service.dart';
 import '../../service/snakbar_service.dart';
 import '../../utils/colors.dart';
+import '../../utils/enum.dart';
 import '../../utils/preference_key.dart';
 
 class DealersScreen extends StatefulWidget {
@@ -21,9 +24,9 @@ class DealersScreen extends StatefulWidget {
 }
 
 class _DealersScreenState extends State<DealersScreen> {
-  WarrantyRequestList? list;
+  AllocatedList? list;
   late ApiProvider _api;
-  Map<int, DealerShortModel> dealerShortMap = {};
+  // Map<int, DealerShortModel> dealerShortMap = {};
 
   @override
   void initState() {
@@ -36,27 +39,34 @@ class _DealersScreenState extends State<DealersScreen> {
 
   reloadScreen() async {
     await _api
-        .getWarrantyRequestListByStockist(SharedpreferenceKey.getUserId())
+        .getAllocatedWarrantyList(SharedpreferenceKey.getUserId())
         .then((value) {
       setState(() {
         list = value;
-        dealerShortMap.clear();
-        for (WarrantyModel model in list?.data ?? []) {
-          if (dealerShortMap.containsKey(model.dealers?.dealerId)) {
-            DealerShortModel dsm = dealerShortMap[model.dealers?.dealerId]!;
-            dsm.count = (dsm.count ?? 0) + 1;
-            dealerShortMap[model.dealers!.dealerId!] = dsm;
-          } else {
-            DealerShortModel dsm = DealerShortModel(
-                count: 1,
-                id: model.dealers?.dealerId,
-                image: model.dealers?.image,
-                name: model.dealers?.dealerName);
-            dealerShortMap[model.dealers!.dealerId!] = dsm;
-          }
-        }
       });
     });
+    // await _api
+    //     .getWarrantyRequestListByStockist(SharedpreferenceKey.getUserId())
+    //     .then((value) {
+    //   setState(() {
+    //     list = value;
+    //     dealerShortMap.clear();
+    //     for (WarrantyModel model in list?.data ?? []) {
+    //       if (dealerShortMap.containsKey(model.dealers?.dealerId)) {
+    //         DealerShortModel dsm = dealerShortMap[model.dealers?.dealerId]!;
+    //         dsm.count = (dsm.count ?? 0) + 1;
+    //         dealerShortMap[model.dealers!.dealerId!] = dsm;
+    //       } else {
+    //         DealerShortModel dsm = DealerShortModel(
+    //             count: 1,
+    //             id: model.dealers?.dealerId,
+    //             image: model.dealers?.image,
+    //             name: model.dealers?.dealerName);
+    //         dealerShortMap[model.dealers!.dealerId!] = dsm;
+    //       }
+    //     }
+    //   });
+    // });
   }
 
   @override
@@ -74,7 +84,7 @@ class _DealersScreenState extends State<DealersScreen> {
         onChanged: (value) {},
         appBarBuilder: (context) => AppBar(
           title: Text(
-            'Dealers',
+            'Allocated Device',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           actions: const [
@@ -89,15 +99,20 @@ class _DealersScreenState extends State<DealersScreen> {
   }
 
   getBody(BuildContext context) {
+    if (_api.status == ApiStatus.loading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return ListView.separated(
         itemBuilder: (context, index) {
-          int key = dealerShortMap.keys.elementAt(index);
+          AllocatedModel? item = list?.data?.elementAt(index);
           return ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(settingsPageUserIconSize),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(110),
-                child: (dealerShortMap[key]?.image?.isEmpty ?? true)
+                child: (item?.dealer?.image?.isEmpty ?? true)
                     ? Image.asset(
                         'assets/images/profile_image_placeholder.png',
                         height: 40,
@@ -105,7 +120,7 @@ class _DealersScreenState extends State<DealersScreen> {
                         fit: BoxFit.cover,
                       )
                     : CachedNetworkImage(
-                        imageUrl: dealerShortMap[key]?.name ?? '',
+                        imageUrl: item?.dealer?.image ?? '',
                         fit: BoxFit.cover,
                         width: 40,
                         height: 40,
@@ -120,7 +135,7 @@ class _DealersScreenState extends State<DealersScreen> {
               ),
             ),
             title: Text(
-              '${dealerShortMap[key]?.name}',
+              '${item?.dealer?.dealerName ?? ''}',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -129,7 +144,7 @@ class _DealersScreenState extends State<DealersScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'ID: $key',
+                  '${item?.warrantySerialNo}',
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -138,7 +153,11 @@ class _DealersScreenState extends State<DealersScreen> {
                   height: 15,
                 ),
                 Text(
-                  '${dealerShortMap[key]?.count} devices',
+                  item?.warrantyRequests?.status ??
+                      AllocationStatus.ALLOCATED.name,
+                  style: TextStyle(
+                      color: getColorByStatus(item?.warrantyRequests?.status ??
+                          AllocationStatus.ALLOCATED.name)),
                 ),
               ],
             ),
@@ -147,7 +166,7 @@ class _DealersScreenState extends State<DealersScreen> {
               color: hintColor,
             ),
             onTap: () => Navigator.pushNamed(context, DealerDetail.routePath,
-                    arguments: {'id': key, 'list': list})
+                    arguments: list?.data?.elementAt(index))
                 .then((value) => reloadScreen()),
           );
         },
@@ -155,6 +174,6 @@ class _DealersScreenState extends State<DealersScreen> {
               color: dividerColor,
               indent: defaultPadding * 5,
             ),
-        itemCount: dealerShortMap.keys.length);
+        itemCount: list?.data?.length ?? 0);
   }
 }
