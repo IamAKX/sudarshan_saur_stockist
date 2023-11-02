@@ -19,6 +19,7 @@ class Api {
       '$baseUrl/saur/warrantyDetails/stockist/';
 
   static const String validateStockist = '$baseUrl/saur/stockists/crm/?';
+  static const String validateStockist2 = '$baseUrl/saur/sdw/crm/?';
   static const String getWarrantyByStockistCode = '$baseUrl/saur/sdw/crm/?';
   static const String allocateToDealer = '$baseUrl/saur/sdw/';
   static const String deviceDetailFromCrm =
