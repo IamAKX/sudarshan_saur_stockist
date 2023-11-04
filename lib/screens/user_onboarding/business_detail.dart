@@ -65,11 +65,13 @@ class _BusinessDetailsState extends State<BusinessDetails> {
                 _api.updateUser({
                   'businessName': _businessNameCtrl.text,
                   'gstNumber': _gstCtrl.text,
-                }, user?.stockistId ?? -1).then((value) {
+                }, user?.stockistId ?? -1).then((value) async {
                   if (value) {
                     SnackBarService.instance.showSnackBarSuccess(
                         'Registration complete. Please login');
                     prefs.clear();
+                    await _api.sendAgreement(user?.mobileNo ?? '', 'stockist',
+                        user?.stockistId.toString() ?? '');
                     Navigator.pushNamedAndRemoveUntil(
                         context, LoginScreen.routePath, (route) => false);
                   }
@@ -97,7 +99,7 @@ class _BusinessDetailsState extends State<BusinessDetails> {
           keyboardType: TextInputType.text,
           obscure: false,
           icon: LineAwesomeIcons.store),
- verticalGap(defaultPadding * 1.5),
+      verticalGap(defaultPadding * 1.5),
       TextButton(
         onPressed: () {
           showPrivacyDialogbox(context);
@@ -117,7 +119,7 @@ class _BusinessDetailsState extends State<BusinessDetails> {
           .showSnackBarError('Business Name cannot be empty');
       return false;
     }
-     if (!agreement) {
+    if (!agreement) {
       SnackBarService.instance
           .showSnackBarError('Please accept terms and conditions');
       return false;
