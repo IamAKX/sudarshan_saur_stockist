@@ -70,8 +70,8 @@ class _BusinessDetailsState extends State<BusinessDetails> {
                     SnackBarService.instance.showSnackBarSuccess(
                         'Registration complete. Please login');
                     prefs.clear();
-                    await _api.sendAgreement(user?.mobileNo ?? '', 'stockist',
-                        user?.stockistId.toString() ?? '');
+                    // await _api.sendAgreement(user?.mobileNo ?? '', 'stockist',
+                    //     user?.stockistId.toString() ?? '');
                     Navigator.pushNamedAndRemoveUntil(
                         context, LoginScreen.routePath, (route) => false);
                   }
