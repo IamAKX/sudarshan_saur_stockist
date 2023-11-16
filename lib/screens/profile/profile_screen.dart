@@ -11,6 +11,7 @@ import 'package:saur_stockist/screens/profile/change_password.dart';
 import 'package:saur_stockist/screens/profile/edit_profile.dart';
 import 'package:saur_stockist/screens/user_onboarding/login_screen.dart';
 import 'package:saur_stockist/utils/colors.dart';
+import 'package:saur_stockist/utils/enum.dart';
 import 'package:saur_stockist/utils/preference_key.dart';
 import 'package:saur_stockist/utils/theme.dart';
 import 'package:saur_stockist/widgets/gaps.dart';
@@ -176,6 +177,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ListTile(
                 tileColor: Colors.white,
                 leading: const Icon(
+                  LineAwesomeIcons.user_slash,
+                ),
+                title: const Text('Delete Account'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  showDeleteAccPopup(context, user!.stockistId!);
+                },
+              ),
+              const Divider(
+                height: 0,
+                color: dividerColor,
+                endIndent: defaultPadding,
+                indent: defaultPadding * 3,
+              ),
+              ListTile(
+                tileColor: Colors.white,
+                leading: const Icon(
                   Icons.logout_outlined,
                   color: Colors.red,
                 ),
@@ -230,52 +248,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
           ),
         ),
-        // Positioned(
-        //   bottom: 1,
-        //   right: 1,
-        //   child: InkWell(
-        //     onTap: isImageUploading
-        //         ? null
-        //         : () async {
-        //             final ImagePicker picker = ImagePicker();
-        //             final XFile? image =
-        //                 await picker.pickImage(source: ImageSource.gallery);
-        //             if (image != null) {
-        //               File imageFile = File(image.path);
-        //               setState(() {
-        //                 isImageUploading = true;
-        //               });
-        //               StorageService.uploadProfileImage(
-        //                       imageFile, user!.stockistId!.toString())
-        //                   .then((value) async {
-        //                 _api.updateUser({'image': value},
-        //                     user?.stockistId ?? -1).then((value) {
-        //                   isImageUploading = false;
-        //                   reloadScreen();
-        //                 });
-        //               });
-        //             }
-        //           },
-        //     child: Container(
-        //       width: 40,
-        //       height: 40,
-        //       decoration: BoxDecoration(
-        //         color: primaryColor,
-        //         shape: BoxShape.circle,
-        //         border: Border.all(
-        //           color: Colors.white,
-        //           width: 3,
-        //         ),
-        //       ),
-        //       child: const Icon(
-        //         Icons.edit,
-        //         color: Colors.white,
-        //         size: 15,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
+    );
+  }
+
+  void showDeleteAccPopup(BuildContext context, int id) {
+    Widget okButton = TextButton(
+      child: const Text('Yes'),
+      onPressed: () {
+        _api.updateUser({'status': UserStatus.SUSPENDED.name}, id).then(
+            (value) {
+          if (value) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                LoginScreen.routePath, (route) => false);
+          }
+        });
+      },
+    );
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          actions: [
+            cancelButton,
+            okButton,
+          ],
+          title: const Text('Are you sure you want to delete your account?'),
+          content: const Text(
+              'This will revoke access to your account and all your account data will be deleted'),
+        );
+      },
     );
   }
 }

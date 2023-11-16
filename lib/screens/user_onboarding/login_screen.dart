@@ -171,11 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           return;
                         }
 
-                        prefs.setInt(SharedpreferenceKey.userId,
-                            value.data?.first.stockistId ?? -1);
-
                         if (value.data?.first.status ==
                             UserStatus.ACTIVE.name) {
+                          prefs.setInt(SharedpreferenceKey.userId,
+                              value.data?.first.stockistId ?? -1);
+
                           Navigator.pushNamedAndRemoveUntil(
                             context,
                             HomeContainer.routePath,
