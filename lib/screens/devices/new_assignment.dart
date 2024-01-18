@@ -9,6 +9,7 @@ import 'package:saur_stockist/widgets/primary_button_dark.dart';
 
 import '../../main.dart';
 import '../../model/dealer_model.dart';
+import '../../model/user_model.dart';
 import '../../model/warranty_model.dart';
 import '../../service/api_service.dart';
 import '../../service/snakbar_service.dart';
@@ -27,7 +28,7 @@ class NewAssignment extends StatefulWidget {
 class _NewAssignmentState extends State<NewAssignment> {
   DealerListModel? list;
   late ApiProvider _api;
-
+  UserModel? user;
   @override
   void initState() {
     super.initState();
@@ -38,7 +39,12 @@ class _NewAssignmentState extends State<NewAssignment> {
 
   reloadScreen() async {
     setState(() async {
+      user = await _api
+          .getStockistById(prefs.getInt(SharedpreferenceKey.userId) ?? -1);
+
       list = await _api.getAllDealers();
+      list?.data?.retainWhere(
+          (element) => element.stockistCode == user?.stockistCode);
       _selectedDealerId = list?.data?.first.dealerId ?? -1;
     });
   }
